@@ -1,4 +1,4 @@
-# Notes Project
+# Scrawl
 # Overview
 We will be working to create a note-taking and white board application
 that has a focus on in the moment note taking as well as various archival
