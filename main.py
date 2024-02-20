@@ -1,14 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-
-
-
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        
         self.title('Scrawl')
         self.geometry('1000x800')
         self.option_add('*tearOff', False)
@@ -21,12 +17,23 @@ class App(tk.Tk):
 
         self.menu_bar.add_cascade(menu=self.menu_file, label='File')
         self.menu_file.add_command(label='New')
-        self.menu_file.add_command(label='Save')
+        self.menu_file.add_command(label='Save', command=self.save_command)
         self.menu_file.add_command(label='Open')
         
         self.menu_bar.add_cascade(menu=self.menu_help, label='Help')
         self.menu_help.add_command(label='Settings')
+        # a reference to the panelControlFrame so we can access it
+        self.panelControlFrame = None 
 
+    def setPanelControlFrame(self, panelControlFrame):
+        self.panelControlFrame = panelControlFrame
+    
+    def save_command(self): # save the current note
+        # access the note from the NoteFrame
+        text = self.panelControlFrame.frames[0].notes.get('1.0', 'end-1c')
+        # save the note to a file
+        with open('note.txt', 'w') as file:
+            file.write(text)
 
 class NoteFrame(ttk.Frame):
     def __init__(self, parent):
@@ -94,6 +101,9 @@ class PanelControlFrame(ttk.Frame):
         self.frames[0] = NoteFrame(parent)
         self.frames[1] = SettingsFrame(parent)
         self.change_frame()
+        
+        # give the parent a reference to this frame
+        parent.setPanelControlFrame(self)
 
     def change_frame(self):
         frame = self.frames[self.index.get()]
