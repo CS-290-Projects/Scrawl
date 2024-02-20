@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import os
 
 class App(tk.Tk):
     def __init__(self):
@@ -31,8 +32,18 @@ class App(tk.Tk):
     def save_command(self): # save the current note
         # access the note from the NoteFrame
         text = self.panelControlFrame.frames[0].notes.get('1.0', 'end-1c')
+        # like in other note programs, the first line is the title
+        title = text.split('\n')[0]
+        # replace spaces with underscores so we can use it as a filename
+        title = title.replace(' ', '_')
+        # if the title is empty, use 'untitled'
+        if title == '':
+            title = 'untitled'
+        # if the notes directory doesn't exist, create it
+        if not os.path.exists('notes'):
+            os.makedirs('notes')
         # save the note to a file
-        with open('note.txt', 'w') as file:
+        with open('notes/' + title + '.txt', 'w') as file:
             file.write(text)
 
 class NoteFrame(ttk.Frame):
