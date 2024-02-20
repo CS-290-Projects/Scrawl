@@ -19,7 +19,7 @@ class App(tk.Tk):
         self.menu_bar.add_cascade(menu=self.menu_file, label='File')
         self.menu_file.add_command(label='New')
         self.menu_file.add_command(label='Save', command=self.save_command)
-        self.menu_file.add_command(label='Open')
+        self.menu_file.add_command(label='Open', command=self.open_command)
         
         self.menu_bar.add_cascade(menu=self.menu_help, label='Help')
         self.menu_help.add_command(label='Settings')
@@ -30,6 +30,7 @@ class App(tk.Tk):
         self.panelControlFrame = panelControlFrame
     
     def save_command(self): # save the current note
+        #TODO: add a title box instead of using the first line of the note
         # access the note from the NoteFrame
         text = self.panelControlFrame.frames[0].notes.get('1.0', 'end-1c')
         # like in other note programs, the first line is the title
@@ -45,6 +46,20 @@ class App(tk.Tk):
         # save the note to a file
         with open('notes/' + title + '.txt', 'w') as file:
             file.write(text)
+    
+    def open_command(self): # open the selected note
+        title = 'test_note' #TODO: add the explorer frame to select a note
+        # try to open the note (it may not exist)
+        try:
+            with open('notes/' + title + '.txt', 'r') as file:
+                text = file.read()
+        except FileNotFoundError:
+            text = 'test note\n\nloaded the text from the file\n\nadding text to this and then saving will update the file\n\nChanging the title variable in the open_command will cause this function to load a different note'
+        # set the note in the NoteFrame
+        self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
+        self.panelControlFrame.frames[0].notes.insert('1.0', text)
+
+        
 
 class NoteFrame(ttk.Frame):
     def __init__(self, parent):
