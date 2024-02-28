@@ -90,6 +90,9 @@ class NoteFrame(ttk.Frame):
 
         self.grid(column=1, row=0, sticky='NSEW')
         
+        # record the time the user started typing (initialize to the current time)
+        self.type_timer = None
+
         self.create_widgets()
         self.create_layout()
 
@@ -98,6 +101,7 @@ class NoteFrame(ttk.Frame):
         self.title = tk.Text(self, width=34,height=1)
         # create a text area for the note
         self.notes = tk.Text(self,width=68, height=45) #width and height is measured in characters
+        self.notes.bind('<KeyRelease>', self.start_typing)
 
     def create_layout(self):
         self.columnconfigure((0,1), weight=1)
@@ -105,7 +109,14 @@ class NoteFrame(ttk.Frame):
 
         self.title.grid(row=0, column=0, sticky='NSEW')
         self.notes.grid(row=1, column=0, sticky='NSEW')
-
+    def start_typing(self, event):
+        print('typing')
+        
+        self.after(1000, self.stop_typing)
+    def stop_typing(self):
+        print('stopped typing')
+        # save the note
+        self.master.master.save_command()
         
 class SettingsFrame(ttk.Frame):
     def __init__(self, parent):
