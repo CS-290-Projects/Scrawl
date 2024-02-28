@@ -49,13 +49,13 @@ class App(tk.Tk):
     
     def open_command(self): # open the selected note
         title = 'test_note' #TODO: add the explorer frame to select a note
-        # try to open the note (it may not exist)
+        # try to open the note file
         try:
             with open('notes/' + title + '.txt', 'r') as file:
                 text = file.read()
         except FileNotFoundError:
             text = 'test note\n\nloaded the text from the file\n\nadding text to this and then saving will update the file\n\nChanging the title variable in the open_command will cause this function to load a different note'
-        # set the note in the NoteFrame
+        # display the note in the frame
         self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
         self.panelControlFrame.frames[0].notes.insert('1.0', text)
 
