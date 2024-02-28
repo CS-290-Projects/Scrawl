@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 import os
 
 class App(tk.Tk):
@@ -23,41 +24,63 @@ class App(tk.Tk):
         
         self.menu_bar.add_cascade(menu=self.menu_help, label='Help')
         self.menu_help.add_command(label='Settings')
+
+        # add a text area for the name of the note
+
         # a reference to the panelControlFrame so we can access it
         self.panelControlFrame = None 
+        # a reference to the filepath of the current note
+        self.filepath = None
 
     def setPanelControlFrame(self, panelControlFrame):
         self.panelControlFrame = panelControlFrame
     
     def save_command(self): # save the current note
-        #TODO: add a title box instead of using the first line of the note
+        title = self.panelControlFrame.frames[0].title.get('1.0', 'end-1c')
         # access the note from the NoteFrame
         text = self.panelControlFrame.frames[0].notes.get('1.0', 'end-1c')
-        # like in other note programs, the first line is the title
-        title = text.split('\n')[0]
-        # replace spaces with underscores so we can use it as a filename
-        title = title.replace(' ', '_')
-        # if the title is empty, use 'untitled'
-        if title == '':
-            title = 'untitled'
-        # if the notes directory doesn't exist, create it
-        if not os.path.exists('notes'):
-            os.makedirs('notes')
+        # if filepath exists, use it
+        if hasattr(self, 'filepath') and self.filepath:
+            filename = self.filepath
+        else:
+
+            # replace spaces with underscores so we can use it as a filename
+            title = title.replace(' ', '_')
+            # if the title is empty, use 'untitled'
+            if title == '':
+                title = 'untitled'
+            # if the notes directory doesn't exist, create it
+            if not os.path.exists('notes'):
+                os.makedirs('notes')
+            # generate the filename
+            filename = 'notes/' + title + '.txt'
         # save the note to a file
-        with open('notes/' + title + '.txt', 'w') as file:
+        with open(filename, 'w') as file:
             file.write(text)
     
     def open_command(self): # open the selected note
-        title = 'test_note' #TODO: add the explorer frame to select a note
-        # try to open the note file
-        try:
-            with open('notes/' + title + '.txt', 'r') as file:
-                text = file.read()
-        except FileNotFoundError:
-            text = 'test note\n\nloaded the text from the file\n\nadding text to this and then saving will update the file\n\nChanging the title variable in the open_command will cause this function to load a different note'
-        # display the note in the frame
-        self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
-        self.panelControlFrame.frames[0].notes.insert('1.0', text)
+        # open a dialog box for the user to select a file
+        filepath = filedialog.askopenfilename(initialdir="notes", title="Select file",
+                                              filetypes=(("text files", "*.txt"), ("all files", "*.*")))# if a file was selected
+        if filepath:
+            # try to open the note file
+            try:
+                with open(filepath, 'r') as file:
+                    text = file.read()
+            except FileNotFoundError:
+                text = 'File not found.'
+            # get the title of the note from the filename
+            title = os.path.basename(filepath)
+            # remove the .txt extension
+            title = title[:-4]
+            # display the title in the frame
+            self.panelControlFrame.frames[0].title.delete('1.0', 'end')
+            self.panelControlFrame.frames[0].title.insert('1.0', title)
+            # display the note in the frame
+            self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
+            self.panelControlFrame.frames[0].notes.insert('1.0', text)
+            # save the filepath so we can save the note back to the same file
+            self.filepath = filepath
 
         
 
@@ -71,13 +94,17 @@ class NoteFrame(ttk.Frame):
         self.create_layout()
 
     def create_widgets(self):
+        # create a title for the note
+        self.title = tk.Text(self, width=34,height=1)
+        # create a text area for the note
         self.notes = tk.Text(self,width=68, height=45) #width and height is measured in characters
 
     def create_layout(self):
-        self.columnconfigure((0,1,2), weight=1, uniform='a')
-        self.rowconfigure((0,1,2), weight=1, uniform='a')
+        self.columnconfigure((0,1), weight=1)
+        self.rowconfigure((0,1), weight=1)
 
-        self.notes.grid(row=0, column=0, sticky='NSEW')
+        self.title.grid(row=0, column=0, sticky='NSEW')
+        self.notes.grid(row=1, column=0, sticky='NSEW')
 
         
 class SettingsFrame(ttk.Frame):
