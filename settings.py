@@ -157,6 +157,13 @@ class SettingsFrame(ttk.Notebook):
         self.example_label.grid(row=1, column=0)
         self.example_bind.grid(row=1, column=1)
         self.change_example_bind.grid(row=1, column=2)
+        
+        # Wieghts
+        self.general_tab.rowconfigure(0, weight=2)
+        self.general_tab.rowconfigure(1, weight=2)
+        self.general_tab.rowconfigure(2, weight=2)
+        self.general_tab.columnconfigure(0, weight=2)
+        self.general_tab.columnconfigure(1, weight=2)
         pass
     
     def alt_key_detector(self, event):

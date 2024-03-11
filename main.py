@@ -19,6 +19,7 @@ class App(tk.Tk):
 
         # Menu bar
         self.menu_bar = tk.Menu(self)
+        self['menu'] = self.menu_bar
         self.menu_file = tk.Menu(self.menu_bar)
         self.menu_help = tk.Menu(self.menu_bar)
 
