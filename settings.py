@@ -1,18 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
-        
+
 class SettingsFrame(ttk.Notebook):
     def __init__(self, parent):
         super().__init__(parent)
 
-        
+        # Theme
+        self.tk.call('source','azure.tcl')
+        self.tk.call("set_theme", 'light')
         # Variables
         self.example_var = tk.StringVar()
         self.example_var.set("Alt + a")
 
         ## General
         self.dark_light_mode_var = tk.StringVar()
-        self.dark_light_mode_var.set('Light mode')
+        self.dark_light_mode_var.set('Dark Mode')
 
         self.conflict_notifier_var = tk.StringVar()
         self.conflict_notifier_var.set("")
@@ -41,6 +43,9 @@ class SettingsFrame(ttk.Notebook):
 
         self.configure(height=70, width=70)
         self.grid(column=1, row=0, sticky='NESW')
+        self.columnconfigure(0, weight=2)
+        self.columnconfigure(1, weight=2)
+        self.rowconfigure(0, weight=2)
 
         
 
@@ -64,10 +69,10 @@ class SettingsFrame(ttk.Notebook):
         self.gen_conflict_notifier = ttk.Label(self.warning_section, textvariable=self.conflict_notifier_var)
         self.gen_conflict_notifier['font'] = '14'
 
-        self.save_to_label = ttk.Label(self.general_tab, text="Save Folder")
 
         self.dark_light_mode_label = ttk.Label(self.general_tab, text='Theme')
         self.dark_light_mode_button = ttk.Button(self.general_tab, textvariable=self.dark_light_mode_var)
+        self.dark_light_mode_button['command'] = lambda: self.change_theme()
         
 
         self.keybind_info_gen_tab = ttk.Label(self.general_tab, text='The keybinds offered on this page are configured to use the control key.')
@@ -116,7 +121,6 @@ class SettingsFrame(ttk.Notebook):
         self.warning_section.grid(row=0, column=0, columnspan=4)
         self.gen_conflict_notifier.grid(row=0, column=0, columnspan=4)
 
-        self.save_to_label.grid(row=1, column=0)
 
         self.dark_light_mode_label.grid(row=2, column=0)
         self.dark_light_mode_button.grid(row=2, column=1)
@@ -192,4 +196,12 @@ class SettingsFrame(ttk.Notebook):
         self.obj = obj
         self.var = var
         obj.bind("<KeyPress>", key_detector)
-        
+
+    def change_theme(self):
+        if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
+            self.tk.call("set_theme", "light")
+            self.dark_light_mode_var.set('Dark Mode')
+        else:
+            self.tk.call("set_theme", "dark")
+            self.dark_light_mode_var.set('Light Mode')
+        pass        
