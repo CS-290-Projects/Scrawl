@@ -13,6 +13,10 @@ class App(tk.Tk):
         self.geometry('1000x800')
         self.option_add('*tearOff', False)
 
+        # Allows the program to resize
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=2)
+
         # Menu bar
         self.menu_bar = tk.Menu(self)
         self['menu'] = self.menu_bar
