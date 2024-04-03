@@ -38,8 +38,7 @@ class NoteFrame(ttk.Frame):
         self.notes.tag_configure("predictive", foreground='grey')
         self.notes.tag_configure('normal', foreground='black')
         self.notes.tag_configure("shorthand", foreground='blue', background='light blue')
-        self.predicted_list = ["hello", "banana", "apple", "blame", "beautiful"]
-        self.shorthand = {'asd':'asdfghjkl'}
+        
 
     def create_widgets(self):
         # create a title for the note
@@ -47,29 +46,35 @@ class NoteFrame(ttk.Frame):
         # create a text area for the note
         self.notes = tk.Text(self,width=68, height=35) #width and height is measured in characters
         # whenever the user lets their key up, call the on_keyup method
-        self.notes.bind('<KeyRelease>', self.on_keyup)
-        
-        self.notes.bind('<KeyRelease>', self.on_input)
-        self.notes.bind('<Right>', self.auto_complete)
-        self.notes.bind('<Up>', self.insert_shorthand)
-        self.notes.bind('<Left>', self.move_left)
-        self.notes.bind('<space>', self.space_pressed)
-    
 
         text_font = ("Helvetica", 12)
-        self.notes.configure(font=text_font)
+        self.notes.configure(font=text_font, wrap='word')
         self.title.configure(font=text_font)
 
     def create_binds(self):
         with open('config.json', 'r') as f:
             config = json.loads(f.read())
             f.close()
-
+        # static
+        self.notes.bind('<KeyRelease>', self.on_keyup)
+        self.notes.bind('<KeyRelease>', self.on_input)
+        self.notes.bind('<Right>', self.auto_complete)
+        self.notes.bind('<Control-Right>', self.insert_shorthand)
+        self.notes.bind('<Left>', self.move_left)
+        self.notes.bind('<space>', self.space_pressed)
         # user defined
         self.notes.bind('<'+config['bold text']+'>', self.change_bold)
         self.notes.bind('<'+config['italic text']+'>', self.change_italics)
         self.notes.bind('<'+config['underline text']+'>', self.change_underline)
-        pass
+        # predicted text and shorthand list
+        self.predicted_list = ['banana']
+        self.shorthand = {}
+        # add shorthand to dict
+        count = 1
+        while count <= 20:
+            self.shorthand.update({config['s' + str(count)] : config['w' + str(count)]})
+            count = count + 1
+            print(count)
 
     def change_bold(self, *args):
         bold_font = font.Font(self.notes, self.notes.cget("font"))
@@ -196,8 +201,6 @@ class NoteFrame(ttk.Frame):
             limiter = int(len(word)/2) + 1
             if word.lower().startswith(user_text.lower()):
                 if int(len(word[len(user_text):])) < limiter:
-                    print(limiter)
-                    print('Pred: {}'.format(word[len(user_text):]))
                     return(word[len(user_text):])
                 return None
         return None
@@ -215,17 +218,21 @@ class NoteFrame(ttk.Frame):
         end_user_text = self.end_user_txt
         end_pred_text = self.notes.index(tk.INSERT + '-1c wordend')
         if self.notes.tag_nextrange('predictive', end_user_text, end_pred_text) != '':
-            print(self.notes.tag_ranges('predictive'))
             self.notes.delete(end_user_text, end_pred_text)
         pass
     
     def insert_shorthand(self, event):
         start_txt = self.start_txt
         end_user_txt = self.end_user_txt
+        if self.complete == '':
+            return None
 
         if self.notes.tag_nextrange('shorthand', start_txt, end_user_txt) != '':
             self.notes.delete(start_txt, end_user_txt)
             self.notes.insert(start_txt, self.complete)
+            new_end = self.notes.index(tk.INSERT + '-1c wordend')
+            self.notes.mark_set('insert', new_end)
+            self.complete = ''
         else:
             return None
         pass
@@ -247,6 +254,12 @@ class NoteFrame(ttk.Frame):
 
     def space_pressed(self, event):
         self.remove_pred_text()
+        # clear shorthand word
+        self.complete = ''
+        #remove shorthand text style
+        range = self.notes.tag_prevrange('shorthand', tk.INSERT)
+        if range != '':
+            self.notes.tag_remove('shorthand',range[0],range[1])
     
     
     def check_timer(self):
