@@ -5,7 +5,6 @@ import time
 import json
 
 
-
 # variables
 autosave = True 
 autosave_interval = 5 # seconds after the user stops typing to save the note (0 to save on each keyup)
@@ -55,6 +54,8 @@ class NoteFrame(ttk.Frame):
         with open('config.json', 'r') as f:
             config = json.loads(f.read())
             f.close()
+        with open('predictiveTextList.json', 'r') as g:
+            pred_list = json.load(g)
         # static
         self.notes.bind('<KeyRelease>', self.on_keyup)
         self.notes.bind('<KeyRelease>', self.on_input)
@@ -67,7 +68,7 @@ class NoteFrame(ttk.Frame):
         self.notes.bind('<'+config['italic text']+'>', self.change_italics)
         self.notes.bind('<'+config['underline text']+'>', self.change_underline)
         # predicted text and shorthand list
-        self.predicted_list = ['banana']
+        self.predicted_list = pred_list
         self.shorthand = {}
         # add shorthand to dict
         count = 1
