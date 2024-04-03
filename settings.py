@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import json
 
+
 class SettingsFrame(ttk.Notebook):
     def __init__(self, parent):
         super().__init__(parent)
@@ -18,12 +19,12 @@ class SettingsFrame(ttk.Notebook):
             with open('config.json', 'w') as f:
                 default_settings = {
                     "theme":"Light Mode",
-                    "save note":"Ctrl + s",
-                    "create note":"Ctrl + n",
-                    "switch note":"Ctrl + m",
-                    "bold text":"Ctrl + b",
-                    "italic text":"Ctrl + i",
-                    "underline text":"Ctrl + u",
+                    "save note":"Control-s",
+                    "create note":"Control-n",
+                    "switch note":"Control-",
+                    "bold text":"Control-b",
+                    "italic text":"Control-i",
+                    "underline text":"Control-u",
                     "s1":"...", "w1":"...",
                     "s2":"...", "w2":"...",
                     "s3":"...", "w3":"...",
@@ -671,11 +672,11 @@ class SettingsFrame(ttk.Notebook):
         pass
     
     def alt_key_detector(self, event):
-        self.var.set("Alt_L + " + event.keysym)
+        self.var.set("Alt-" + event.keysym)
         self.obj['state'] = 'disable'
     
     def ctrl_key_detector(self, event):
-        self.var.set("Ctrl + " + event.keysym)
+        self.var.set("Control-" + event.keysym)
         self.obj['state'] = 'disable'
         self.keybind_info_gen_tab.focus_set() # removes the users ablilty to continue editing the bind, even after the entry widget is disabled
         self.config[self.save_grabber] = self.var.get()
@@ -717,6 +718,8 @@ class SettingsFrame(ttk.Notebook):
         with open('config.json', 'w') as f:
             json.dump(self.config, f, indent=4)
             f.close()
+            
+            
      
         
 
