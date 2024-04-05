@@ -24,7 +24,6 @@ class NoteFrame(ttk.Frame):
         self.type_timer = 0
         self.bold_on_off = False
         
-    
 
 
 
@@ -38,7 +37,6 @@ class NoteFrame(ttk.Frame):
         self.notes.tag_configure('normal', foreground='black')
         self.notes.tag_configure("shorthand", foreground='blue', background='light blue')
         
-
     def create_widgets(self):
         # create a title for the note
         self.title = tk.Text(self, width=34,height=1)
@@ -63,6 +61,7 @@ class NoteFrame(ttk.Frame):
         self.notes.bind('<Control-Right>', self.insert_shorthand)
         self.notes.bind('<Left>', self.move_left)
         self.notes.bind('<space>', self.space_pressed)
+        self.notes.bind('<Tab>', self.space_pressed)
         # user defined
         self.notes.bind('<'+config['bold text']+'>', self.change_bold)
         self.notes.bind('<'+config['italic text']+'>', self.change_italics)
@@ -75,7 +74,6 @@ class NoteFrame(ttk.Frame):
         while count <= 20:
             self.shorthand.update({config['s' + str(count)] : config['w' + str(count)]})
             count = count + 1
-            print(count)
 
     def change_bold(self, *args):
         bold_font = font.Font(self.notes, self.notes.cget("font"))
@@ -137,14 +135,12 @@ class NoteFrame(ttk.Frame):
             else:
                 self.notes.tag_add("underline", text_cursor_position, text_end)
 
-
     def on_keyup(self, event):
         # set the timer to the current time
         self.type_timer = time.time()
         if autosave:
             # after autosave_interval seconds, save the note unless the user types again
             self.after(autosave_interval * 1000, self.check_timer)
-
            
     def on_input(self, event):
         user_text = self.get_user_text()
@@ -184,7 +180,6 @@ class NoteFrame(ttk.Frame):
             self.complete = ''
         return None
     
-
     def check_if_in_word(self):
         cursor_pos = self.notes.index(tk.INSERT)
         start_txt = float(self.start_txt)
@@ -261,7 +256,6 @@ class NoteFrame(ttk.Frame):
         range = self.notes.tag_prevrange('shorthand', tk.INSERT)
         if range != '':
             self.notes.tag_remove('shorthand',range[0],range[1])
-    
     
     def check_timer(self):
         # if the user hasn't typed for autosave_interval seconds

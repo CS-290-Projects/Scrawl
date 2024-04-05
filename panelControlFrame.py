@@ -35,11 +35,16 @@ class PanelControlFrame(ttk.Frame):
         self.frames[1] = SettingsFrame(parent)
         self.change_frame()
         
+        
         # give the parent a reference to this frame
         parent.setPanelControlFrame(self)
 
+
     def change_frame(self):
         frame = self.frames[self.index.get()]
+        if frame == self.frames[0]:
+            #grab the binds the user has created when they switch back to the notes page
+            self.frames[0].create_binds()
         frame.tkraise()
 
     def set(self, index):

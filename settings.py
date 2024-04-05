@@ -718,10 +718,7 @@ class SettingsFrame(ttk.Notebook):
         with open('config.json', 'w') as f:
             json.dump(self.config, f, indent=4)
             f.close()
-            
-            
-     
-        
+
 
     def init_theme(self):
         self.tk.call('source','azure.tcl')
