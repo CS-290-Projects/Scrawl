@@ -25,6 +25,8 @@ class SettingsFrame(ttk.Notebook):
                     "bold text":"Control-b",
                     "italic text":"Control-i",
                     "underline text":"Control-u",
+                    "autocomplete":"Alt-a",
+                    "shorthand insert":"Alt-s",
                     "s1":"...", "w1":"...",
                     "s2":"...", "w2":"...",
                     "s3":"...", "w3":"...",
@@ -94,6 +96,12 @@ class SettingsFrame(ttk.Notebook):
         self.underline_text_var = tk.StringVar()
         self.underline_text_var.set(self.config['underline text'])
 
+        # keybinds page
+        self.autocomplete_var = tk.StringVar()
+        self.autocomplete_var.set(self.config['autocomplete'])
+
+        self.shorthand_insert_var = tk.StringVar()
+        self.shorthand_insert_var.set(self.config['shorthand insert'])
         
         ## Shorthand
         """
@@ -325,10 +333,15 @@ class SettingsFrame(ttk.Notebook):
         # Key Binds Tab Widget Creation
         # Keybinds should be based on the alt key
 
-        self.example_label = ttk.Label(self.keybinds_tab, text="Key Bind:")
-        self.example_bind = ttk.Entry(self.keybinds_tab, textvariable=self.example_var, state='disabled')
-        self.change_example_bind = ttk.Button(self.keybinds_tab, text='Edit')
-        self.change_example_bind['command'] = lambda: self.change_key_bind(self.example_bind, self.example_var, self.alt_key_detector, '')
+        self.autocomplete_label = ttk.Label(self.keybinds_tab, text="Auto Complete")
+        self.autocomplete_bind = ttk.Entry(self.keybinds_tab, textvariable=self.autocomplete_var, state='disabled')
+        self.autocomplete_edit = ttk.Button(self.keybinds_tab, text='Edit')
+        self.autocomplete_edit['command'] = lambda: self.change_key_bind(self.autocomplete_bind, self.autocomplete_var, self.alt_key_detector, 'autocomplete')
+
+        self.shorthand_insert_label = ttk.Label(self.keybinds_tab, text='Shorthand -> Whole')
+        self.shorthand_insert_bind = ttk.Entry(self.keybinds_tab, textvariable=self.shorthand_insert_var, state='disabled')
+        self.shorthand_insert_edit = ttk.Button(self.keybinds_tab, text='Edit')
+        self.shorthand_insert_edit['command'] = lambda: self.change_key_bind(self.shorthand_insert_bind, self.shorthand_insert_var, self.alt_key_detector, 'shorthand insert')
 
         # Shorthand Tab Widget Creation
         # label shorthand -> real text
@@ -513,10 +526,14 @@ class SettingsFrame(ttk.Notebook):
         self.underline_text_edit.grid(row=9, column=2, sticky='NW')
         
         # Keybinds Tab Layout
+        
+        self.autocomplete_label.grid(row=0, column=0, sticky='NW')
+        self.autocomplete_bind.grid(row=0, column=1, sticky='NW')
+        self.autocomplete_edit.grid(row=0, column=2, sticky='NW')
 
-        self.example_label.grid(row=1, column=0)
-        self.example_bind.grid(row=1, column=1)
-        self.change_example_bind.grid(row=1, column=2)
+        self.shorthand_insert_label.grid(row=1, column=0, sticky='NW')
+        self.shorthand_insert_bind.grid(row=1, column=1, sticky='NW')
+        self.shorthand_insert_edit.grid(row=1, column=2, sticky='NW')
         
         # Shorthand Tab Layout
         self.shorthand_label_frame.grid(row=0, column=0, sticky='NW')
@@ -643,6 +660,14 @@ class SettingsFrame(ttk.Notebook):
         self.general_tab.columnconfigure(2, weight=2)
 
         ## Keybinds
+        self.keybinds_tab.rowconfigure(0, weight=2)
+        self.keybinds_tab.rowconfigure(1, weight=2)
+        self.keybinds_tab.rowconfigure(2, weight=2)
+        self.keybinds_tab.rowconfigure(3, weight=2)
+        self.keybinds_tab.columnconfigure(0, weight=2)
+        self.keybinds_tab.columnconfigure(1, weight=2)
+        self.keybinds_tab.columnconfigure(2, weight=2)
+        self.keybinds_tab.columnconfigure(3, weight=2)
 
         ## Shorthand
         self.shorthand_tab.rowconfigure(0, weight=2)
@@ -674,6 +699,9 @@ class SettingsFrame(ttk.Notebook):
     def alt_key_detector(self, event):
         self.var.set("Alt-" + event.keysym)
         self.obj['state'] = 'disable'
+        self.keybind_info_gen_tab.focus_set()
+        self.config[self.save_grabber] = self.var.get()
+        self.auto_save()
     
     def ctrl_key_detector(self, event):
         self.var.set("Control-" + event.keysym)

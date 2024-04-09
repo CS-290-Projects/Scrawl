@@ -57,8 +57,6 @@ class NoteFrame(ttk.Frame):
         # static
         self.notes.bind('<KeyRelease>', self.on_keyup)
         self.notes.bind('<KeyRelease>', self.on_input)
-        self.notes.bind('<Right>', self.auto_complete)
-        self.notes.bind('<Control-Right>', self.insert_shorthand)
         self.notes.bind('<Left>', self.move_left)
         self.notes.bind('<space>', self.space_pressed)
         self.notes.bind('<Tab>', self.space_pressed)
@@ -66,6 +64,8 @@ class NoteFrame(ttk.Frame):
         self.notes.bind('<'+config['bold text']+'>', self.change_bold)
         self.notes.bind('<'+config['italic text']+'>', self.change_italics)
         self.notes.bind('<'+config['underline text']+'>', self.change_underline)
+        self.notes.bind('<'+config['autocomplete']+'>', self.auto_complete)
+        self.notes.bind('<'+config['shorthand insert']+'>', self.insert_shorthand)
         # predicted text and shorthand list
         self.predicted_list = pred_list
         self.shorthand = {}
