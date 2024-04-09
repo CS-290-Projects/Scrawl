@@ -9,7 +9,7 @@ import json
 autosave = True 
 autosave_interval = 5 # seconds after the user stops typing to save the note (0 to save on each keyup)
 avaliable_fonts = {}
-
+undo_redo_stack = []
 
 
 
@@ -60,6 +60,9 @@ class NoteFrame(ttk.Frame):
         self.notes.bind('<Left>', self.move_left)
         self.notes.bind('<space>', self.space_pressed)
         self.notes.bind('<Tab>', self.space_pressed)
+        self.notes.bind('<Control-z>', self.undo)
+        self.notes.bind('<Control-y>', self.redo)
+        self.notes.bind('<BackSpace>', self.on_backspace)
         # user defined
         self.notes.bind('<'+config['bold text']+'>', self.change_bold)
         self.notes.bind('<'+config['italic text']+'>', self.change_italics)
@@ -250,12 +253,30 @@ class NoteFrame(ttk.Frame):
 
     def space_pressed(self, event):
         self.remove_pred_text()
+        undo_redo_stack.clear()
         # clear shorthand word
         self.complete = ''
         #remove shorthand text style
         range = self.notes.tag_prevrange('shorthand', tk.INSERT)
         if range != '':
             self.notes.tag_remove('shorthand',range[0],range[1])
+
+    def undo(self, event):
+        user_text = self.get_user_text()
+        undo_redo_stack.insert(0, user_text)
+        self.notes.delete(self.start_txt, self.end_user_txt)
+        print(undo_redo_stack)
+
+    def redo(self, event):
+        self.notes.insert(tk.INSERT, undo_redo_stack[0])
+        undo_redo_stack.pop(0)
+        print(undo_redo_stack)
+    
+
+
+    def on_backspace(self, event):
+        undo_redo_stack.clear()
+        pass
     
     def check_timer(self):
         # if the user hasn't typed for autosave_interval seconds
