@@ -147,8 +147,9 @@ class NoteFrame(ttk.Frame):
            
     def on_input(self, event):
         user_text = self.get_user_text()
+        print('['+user_text+']')
         if user_text == ' ':
-            print('no user input')
+            self.remove_pred_text()
             return
         check = self.check_if_in_word()
         if check is True:
@@ -195,11 +196,10 @@ class NoteFrame(ttk.Frame):
             return True
     
     def compare_to_pred_list(self, user_text):
-        print('user text: {}'.format(user_text))
         for word in self.predicted_list:
-            limiter = int(len(word)/2) + 1
+            limiter = int(len(word)/2 + 1)
             if word.lower().startswith(user_text.lower()):
-                if int(len(word[len(user_text):])) < limiter:
+                if int(len(word[len(user_text):])) <= limiter:
                     return(word[len(user_text):])
                 return None
         return None
@@ -216,9 +216,10 @@ class NoteFrame(ttk.Frame):
     def remove_pred_text(self):
         end_user_text = self.end_user_txt
         end_pred_text = self.notes.index(tk.INSERT + '-1c wordend')
+        print(end_user_text + ' ' + end_pred_text)
         if self.notes.tag_nextrange('predictive', end_user_text, end_pred_text) != '':
             self.notes.delete(end_user_text, end_pred_text)
-        pass
+        
     
     def insert_shorthand(self, event):
         start_txt = self.start_txt
@@ -271,8 +272,6 @@ class NoteFrame(ttk.Frame):
         self.notes.insert(tk.INSERT, undo_redo_stack[0])
         undo_redo_stack.pop(0)
         print(undo_redo_stack)
-    
-
 
     def on_backspace(self, event):
         undo_redo_stack.clear()
