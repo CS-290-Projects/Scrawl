@@ -146,6 +146,7 @@ class NoteFrame(ttk.Frame):
         user_text = self.get_user_text()
         if user_text == ' ':
             print('no user input')
+            self.remove_pred_text()
             return
         check = self.check_if_in_word()
         if check is True:
@@ -212,7 +213,7 @@ class NoteFrame(ttk.Frame):
 
     def remove_pred_text(self):
         end_user_text = self.end_user_txt
-        end_pred_text = self.notes.index(tk.INSERT + '-1c wordend')
+        end_pred_text = self.notes.index(tk.INSERT + ' wordend')
         if self.notes.tag_nextrange('predictive', end_user_text, end_pred_text) != '':
             self.notes.delete(end_user_text, end_pred_text)
         pass
@@ -249,7 +250,7 @@ class NoteFrame(ttk.Frame):
         self.notes.mark_set('insert', 'insert')
 
     def space_pressed(self, event):
-        self.remove_pred_text()
+        
         # clear shorthand word
         self.complete = ''
         #remove shorthand text style
