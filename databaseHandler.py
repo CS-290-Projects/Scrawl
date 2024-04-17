@@ -44,8 +44,12 @@ class DatabaseHandler:
     def search_titles(self, partial_title):
         conn = sqlite3.connect('notes.db')
         c = conn.cursor()
-        # Use LIKE for partial matching
         c.execute("SELECT title FROM notes WHERE title LIKE ?", ('%' + partial_title + '%',))
         titles = c.fetchall()
+        # now that we have the titles, search the contents of the notes for the search term
+        # any note that contains the search term should be displayed
+        c.execute("SELECT title FROM notes WHERE note_text LIKE ?", ('%' + partial_title + '%',))
+        titles += c.fetchall()
         conn.close()
-        return [title[0] for title in titles]
+        # Convert the list of titles to a set to remove duplicates, then convert it back to a list
+        return list(set(title[0] for title in titles))

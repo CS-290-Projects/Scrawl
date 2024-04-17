@@ -21,7 +21,6 @@ class App(tk.Tk):
         self.menu_bar.add_cascade(menu=self.menu_file, label='File')
         self.menu_file.add_command(label='New')
         self.menu_file.add_command(label='Save', command=self.save_command)
-        self.menu_file.add_command(label='Open', command=self.open_command)
         
         self.menu_bar.add_cascade(menu=self.menu_help, label='Help')
         self.menu_help.add_command(label='Settings')
@@ -51,14 +50,19 @@ class App(tk.Tk):
         # save the note to the database
         self.db.save_note_to_db(title, text)
     
-    def open_command(self): # open the selected note from the database
-        # get the title of the note from the title text area
-        title = self.panelControlFrame.frames[0].title.get('1.0', 'end-1c')
+    def open_command(self, title): # open the selected note from the database
+        print('Opening note:', title)
         # get the note from the database
         text = self.db.open_note_from_db(title)
         # display the note in the frame
-        self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
-        self.panelControlFrame.frames[0].notes.insert('1.0', text)
+        # try to open the note
+        try:
+            self.panelControlFrame.frames[0].notes.delete('1.0', 'end')
+            self.panelControlFrame.frames[0].notes.insert('1.0', text)
+            self.panelControlFrame.frames[0].title.delete('1.0', 'end')
+            self.panelControlFrame.frames[0].title.insert('1.0', title)
+        except Exception as e:
+            print('Error opening note:', str(e))
 
 
 if __name__ == "__main__":
