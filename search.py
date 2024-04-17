@@ -10,6 +10,7 @@ tabtoautocomplete = True # if the user presses tab, attempt to autocomplete the 
 class SearchFrame(ttk.Frame):
     def __init__(self, parent, controlframe):
         super().__init__(parent)
+        self.use_synonyms = False
 
         self.grid(column=1, row=0, sticky='NSEW')
         
@@ -20,6 +21,7 @@ class SearchFrame(ttk.Frame):
         self.create_layout()
         self.master = parent
         self.controlframe = controlframe
+        
 
     def create_widgets(self):
         
@@ -30,10 +32,17 @@ class SearchFrame(ttk.Frame):
         # create a box to preview the note
         self.preview = tk.Text(self, width=40, height=45)
         self.preview.config(state='disabled')
+        # a button to toggle the use of synonyms
+        self.synonyms = ttk.Checkbutton(self, text='Use Synonyms', command=self.toggle_synonyms)
         # display everything
         self.search_command()
         # when the user types in the search bar, call the search method
         self.search.bind('<KeyRelease>', self.search_command)
+    def toggle_synonyms(self):
+        # toggle the use of synonyms
+        self.use_synonyms = not self.use_synonyms
+        # search again
+        self.search_command()
     def preview_command(self, title):
         # get the note from the database
         text = self.master.db.open_note_from_db(title)
@@ -61,7 +70,7 @@ class SearchFrame(ttk.Frame):
         # get the text from the search bar
         text = self.search.get()
         # search the database for notes that match the text
-        titles = self.master.db.search_titles(text)
+        titles = self.master.db.search_titles(text, self.use_synonyms)
         # clear the listbox
         self.results.delete(0, 'end')
         # remove unnamed notes
@@ -88,6 +97,8 @@ class SearchFrame(ttk.Frame):
         # add another row to the search frame
 
         self.search.grid(row=0, column=0, sticky='NSEW')
+        self.synonyms.grid(row=0, column=1, sticky='NSEW')
         self.results.grid(row=1, column=0, sticky='NSEW')
         self.preview.grid(row=1, column=1, sticky='NSEW')
+        
         

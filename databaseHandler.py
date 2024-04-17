@@ -1,4 +1,5 @@
 import sqlite3
+from nltk.corpus import wordnet
 
 # This class is responsible for handling the database operations
 
@@ -41,15 +42,35 @@ class DatabaseHandler:
             return note_text[0]
         else:
             return 'Note not found.'
-    def search_titles(self, partial_title):
+        
+    def get_synonyms(self, word):
+        synonyms = set()
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                synonyms.add(lemma.name().replace('_', ' '))
+        print(synonyms)
+        return list(synonyms)
+
+    def search_titles(self, partial_title, use_synonyms=True):
         conn = sqlite3.connect('notes.db')
         c = conn.cursor()
-        c.execute("SELECT title FROM notes WHERE title LIKE ?", ('%' + partial_title + '%',))
-        titles = c.fetchall()
-        # now that we have the titles, search the contents of the notes for the search term
-        # any note that contains the search term should be displayed
-        c.execute("SELECT title FROM notes WHERE note_text LIKE ?", ('%' + partial_title + '%',))
-        titles += c.fetchall()
+
+        search_terms = [partial_title]  # Always include the original search term
+
+        # Get synonyms for the search term if use_synonyms is True
+        if use_synonyms:
+            search_terms += self.get_synonyms(partial_title)
+
+        titles = []
+        for term in search_terms:
+            # Search titles
+            c.execute("SELECT title FROM notes WHERE title LIKE ?", ('%' + term + '%',))
+            titles += c.fetchall()
+
+            # Search note contents
+            c.execute("SELECT title FROM notes WHERE note_text LIKE ?", ('%' + term + '%',))
+            titles += c.fetchall()
+
         conn.close()
         # Convert the list of titles to a set to remove duplicates, then convert it back to a list
         return list(set(title[0] for title in titles))

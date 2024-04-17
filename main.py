@@ -19,7 +19,7 @@ class App(tk.Tk):
         self.menu_help = tk.Menu(self.menu_bar)
 
         self.menu_bar.add_cascade(menu=self.menu_file, label='File')
-        self.menu_file.add_command(label='New')
+        # self.menu_file.add_command(label='New')
         self.menu_file.add_command(label='Save', command=self.save_command)
         
         self.menu_bar.add_cascade(menu=self.menu_help, label='Help')
