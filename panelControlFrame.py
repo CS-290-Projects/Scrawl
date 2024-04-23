@@ -40,12 +40,17 @@ class PanelControlFrame(ttk.Frame):
         self.frames[2] = SearchFrame(parent, self)
         self.change_frame()
         
+        
         # give the parent a reference to this frame
         parent.setPanelControlFrame(self)
         print('PanelControlFrame created')
 
+
     def change_frame(self):
         frame = self.frames[self.index.get()]
+        if frame == self.frames[0]:
+            #grab the binds the user has created when they switch back to the notes page
+            self.frames[0].create_binds()
         frame.tkraise()
         # if the frame is the search frame completely reset the search frame
         if self.index.get() == 2:
